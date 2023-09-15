@@ -1,0 +1,42 @@
+name: Go package
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.19'
+
+      - name: Install dependencies
+        run: |
+          go get .
+
+      - name: Build
+        run: go build -v ./...
+
+#      - name: Test
+#        run: go test -v ./...
+
+      - name: Compress
+        run: |
+          tar -czvf litra.tar.gz litra
+
+      - uses: shogo82148/actions-upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_content_type: application/tar
+          asset_path: litra.tar.gz
+          asset_name: litra-macos-amd64.tar.gz
