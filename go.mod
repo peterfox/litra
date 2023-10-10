@@ -2,7 +2,6 @@ module litra
 
 go 1.19
 
-require (
-	github.com/derickr/go-litra-driver v0.0.0-20221104155011-9fc8dc6f41b4 // indirect
-	github.com/karalabe/usb v0.0.2 // indirect
-)
+require github.com/sstallion/go-hid v0.14.1
+
+require golang.org/x/sys v0.8.0 // indirect
