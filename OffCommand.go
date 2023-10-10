@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 
-	"github.com/derickr/go-litra-driver"
+	"litra/driver"
 )
 
 func NewOffCommand() *OffCommand {
@@ -29,7 +29,7 @@ func (g *OffCommand) Init(args []string) error {
 }
 
 func (g *OffCommand) Run() error {
-	ld, err := litra.New()
+	ld, err := driver.New()
 
 	if err != nil {
 		panic(err)

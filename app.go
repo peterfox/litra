@@ -15,6 +15,7 @@ func main() {
 		fmt.Println("Commands:")
 		fmt.Println("  on")
 		fmt.Println("  off")
+		fmt.Println("  toggle")
 		fmt.Println()
 	}
 
@@ -41,6 +42,7 @@ func root(args []string) error {
 	cmds := []Runner{
 		NewOnCommand(),
 		NewOffCommand(),
+		NewToggleCommand(),
 	}
 
 	subcommand := os.Args[1]
