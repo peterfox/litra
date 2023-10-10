@@ -7,6 +7,7 @@ Just a simple utility to work with the Logitech Litra Glow light.
 ```shell
 $ litra on
 $ litra off
+$ litra toggle
 ```
 
 ## Build
