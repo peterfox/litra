@@ -13,7 +13,8 @@ $ litra toggle
 ## Build
 
 ```shell
-go build
+go get .
+go build -v .
 ``` 
 
 ## License
