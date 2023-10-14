@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"litra/driver"
 )
 
@@ -31,7 +32,8 @@ func (g *OnCommand) Run() error {
 	ld, err := driver.New()
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Device not found")
+		return nil
 	}
 
 	ld.TurnOn()
