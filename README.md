@@ -2,6 +2,17 @@
 
 Just a simple utility to work with the Logitech Litra Glow light.
 
+## Install
+
+### Brew
+
+You can install via brew.
+
+```sh
+brew tap peterfox/litra
+brew install litra
+```
+
 ## Usage
 
 ```shell
