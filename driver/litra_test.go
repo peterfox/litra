@@ -59,6 +59,25 @@ func TestGetSetBrightness(t *testing.T) {
 	}
 }
 
+func TestRawBrightnessToPercent(t *testing.T) {
+	tests := []struct {
+		raw  byte
+		want int
+	}{
+		{minBrightness, 0},
+		{maxBrightness, 100},
+		{0x00, 0},   // below min clamps to 0
+		{0xff, 100}, // above max clamps to 100
+		{0x87, 50},  // midpoint
+	}
+	for _, tt := range tests {
+		got := rawBrightnessToPercent(tt.raw)
+		if got != tt.want {
+			t.Errorf("rawBrightnessToPercent(%#x) = %d, want %d", tt.raw, got, tt.want)
+		}
+	}
+}
+
 func TestGetSetTemperature(t *testing.T) {
 	tests := []struct {
 		temp int
