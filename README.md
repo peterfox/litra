@@ -19,14 +19,15 @@ brew install litra
 $ litra on
 $ litra off
 $ litra toggle
+$ litra brightness 50      # 0-100 (percent)
+$ litra temperature 4000   # 2700-6500 (kelvin)
 ```
 
 ## Build
 
 ```shell
-go get .
 go build -v .
-``` 
+```
 
 ## License
 
