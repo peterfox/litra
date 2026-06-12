@@ -2,57 +2,49 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"os"
+
+	"litra/driver"
 )
 
-func main() {
-	flag.Usage = func() {
-		// lists out the commands
-		fmt.Println("Usage: litra <command>")
-		fmt.Println()
-		fmt.Println("Commands:")
-		fmt.Println("  on")
-		fmt.Println("  off")
-		fmt.Println("  toggle")
-		fmt.Println()
+func usage() {
+	fmt.Println("Usage: litra <command>")
+	fmt.Println()
+	fmt.Println("Commands:")
+	for _, cmd := range commands {
+		fmt.Printf("  %-25s %s\n", cmd.usage, cmd.summary)
 	}
+	fmt.Println()
+}
 
-	if err := root(os.Args[1:]); err != nil {
-		flag.Usage()
-
-		fmt.Println(err)
+func main() {
+	if err := run(os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, "Error:", err)
 		os.Exit(1)
 	}
 }
 
-type Runner interface {
-	Init([]string) error
-	Run() error
-	Name() string
-}
-
-func root(args []string) error {
-
+func run(args []string) error {
 	if len(args) < 1 {
-		return errors.New("You must pass a command")
+		usage()
+		return errors.New("you must pass a command")
 	}
 
-	cmds := []Runner{
-		NewOnCommand(),
-		NewOffCommand(),
-		NewToggleCommand(),
-	}
-
-	subcommand := os.Args[1]
-
-	for _, cmd := range cmds {
-		if cmd.Name() == subcommand {
-			cmd.Init(os.Args[2:])
-			return cmd.Run()
+	for _, cmd := range commands {
+		if cmd.name != args[0] {
+			continue
 		}
+
+		ld, err := driver.New()
+		if err != nil {
+			return fmt.Errorf("device not found: %w", err)
+		}
+		defer ld.Close()
+
+		return cmd.run(ld, args[1:])
 	}
 
-	return fmt.Errorf("Unknown command: %s", subcommand)
+	usage()
+	return fmt.Errorf("unknown command: %s", args[0])
 }
