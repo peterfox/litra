@@ -35,7 +35,7 @@ func TestIntArg(t *testing.T) {
 }
 
 func TestCommandNames(t *testing.T) {
-	want := []string{"on", "off", "toggle", "brightness", "temperature"}
+	want := []string{"on", "off", "toggle", "brightness", "temperature", "brightness-up", "brightness-down", "temperature-up", "temperature-down", "profile"}
 
 	if len(commands) != len(want) {
 		t.Fatalf("len(commands) = %d, want %d", len(commands), len(want))
@@ -53,6 +53,36 @@ func TestCommandNames(t *testing.T) {
 		if cmd.run == nil {
 			t.Errorf("command %q has no run function", cmd.name)
 		}
+	}
+}
+
+func TestOptionalStepArg(t *testing.T) {
+	tests := []struct {
+		name       string
+		args       []string
+		defaultVal int
+		want       int
+		wantErr    bool
+	}{
+		{"no args uses default", []string{}, 10, 10, false},
+		{"explicit step", []string{"5"}, 10, 5, false},
+		{"step of 1", []string{"1"}, 10, 1, false},
+		{"zero step", []string{"0"}, 10, 0, true},
+		{"negative step", []string{"-1"}, 10, 0, true},
+		{"not a number", []string{"abc"}, 10, 0, true},
+		{"too many args", []string{"5", "10"}, 10, 0, true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := optionalStepArg(tt.args, "test", tt.defaultVal)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("optionalStepArg(%v) error = %v, wantErr %v", tt.args, err, tt.wantErr)
+			}
+			if got != tt.want {
+				t.Errorf("optionalStepArg(%v) = %d, want %d", tt.args, got, tt.want)
+			}
+		})
 	}
 }
 

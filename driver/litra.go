@@ -120,6 +120,49 @@ func (d *LitraDevice) SetTemperature(temp int) error {
 	return d.write(getSetTemperature(temp))
 }
 
+// State holds the current light configuration as returned by the device.
+type State struct {
+	On          bool
+	Brightness  int // percentage 0-100
+	Temperature int // kelvin 2700-6500
+}
+
+func rawBrightnessToPercent(raw byte) int {
+	if raw <= minBrightness {
+		return 0
+	}
+	if raw >= maxBrightness {
+		return 100
+	}
+	return int(float64(raw-minBrightness) / float64(maxBrightness-minBrightness) * 100)
+}
+
+func (d *LitraDevice) GetState() (*State, error) {
+	if _, err := d.dev.Write(getLightState()); err != nil {
+		return nil, fmt.Errorf("writing to device: %w", err)
+	}
+
+	response := make([]byte, reportLength)
+	n, err := d.dev.ReadWithTimeout(response, 5*time.Second)
+	if err != nil {
+		return nil, fmt.Errorf("reading device response: %w", err)
+	}
+	if n < 8 {
+		return nil, fmt.Errorf("short device response: %d bytes", n)
+	}
+
+	temp := int(response[6])<<8 | int(response[7])
+	if temp < minTemperature || temp > maxTemperature {
+		temp = minTemperature
+	}
+
+	return &State{
+		On:          response[4] == 0x01,
+		Brightness:  rawBrightnessToPercent(response[5]),
+		Temperature: temp,
+	}, nil
+}
+
 func (d *LitraDevice) Close() error {
 	err := d.dev.Close()
 	if exitErr := hid.Exit(); err == nil {
